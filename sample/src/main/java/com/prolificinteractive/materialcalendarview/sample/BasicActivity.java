@@ -13,6 +13,8 @@ import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -38,6 +40,12 @@ public class BasicActivity extends AppCompatActivity implements OnDateSelectedLi
 
         widget.setOnDateChangedListener(this);
         widget.setOnMonthChangedListener(this);
+        widget.setShowOtherDates(MaterialCalendarView.SHOW_OTHER_MONTHS);
+
+        ArrayList<Date> dates = new ArrayList<>();
+        dates.add(new Date());
+
+        widget.setActiveDates(dates);
 
         //Setup initial text
         textView.setText(getSelectedDatesString());

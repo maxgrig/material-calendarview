@@ -66,6 +66,9 @@ import java.util.List;
  */
 public class MaterialCalendarView extends ViewGroup {
 
+    private boolean hasCustomEnabledDates;
+    private List<CalendarDay> enabledDates;
+
     /**
      * {@linkplain IntDef} annotation for selection mode.
      *
@@ -961,6 +964,10 @@ public class MaterialCalendarView extends ViewGroup {
         setWeekDayTextAppearance(ss.weekDayTextAppearance);
         setShowOtherDates(ss.showOtherDates);
         setRangeDates(ss.minDate, ss.maxDate);
+        setHasCustomEnabledDates(ss.hasCustomEnabledDays);
+        if (ss.hasCustomEnabledDays) {
+            setEnabledDates(ss.enabledDates);
+        }
         clearSelection();
         for (CalendarDay calendarDay : ss.selectedDates) {
             setDateSelected(calendarDay, true);
@@ -990,6 +997,33 @@ public class MaterialCalendarView extends ViewGroup {
         pager.setCurrentItem(position, false);
     }
 
+    public boolean getHasCustomEnabledDates() {
+        return hasCustomEnabledDates;
+    }
+
+    public void setHasCustomEnabledDates(boolean hasCustomEnabledDates) {
+        this.hasCustomEnabledDates = hasCustomEnabledDates;
+        adapter.setHasCustomEnabledDates(hasCustomEnabledDates);
+    }
+
+    public List<CalendarDay> getEnabledDates() {
+        return enabledDates;
+    }
+
+    private void setEnabledDates(List<CalendarDay> dates) {
+        this.enabledDates = dates;
+        adapter.setEnabledDates(dates);
+        setHasCustomEnabledDates(true);
+    }
+
+    public void setActiveDates(List<Date> dates) {
+        List<CalendarDay> days = new ArrayList<>();
+        for (Date date : dates) {
+            days.add(CalendarDay.from(date));
+        }
+        setEnabledDates(days);
+    }
+
     public static class SavedState extends BaseSavedState {
 
         int color = 0;
@@ -999,6 +1033,8 @@ public class MaterialCalendarView extends ViewGroup {
         CalendarDay minDate = null;
         CalendarDay maxDate = null;
         List<CalendarDay> selectedDates = new ArrayList<>();
+        boolean hasCustomEnabledDays = false;
+        List<CalendarDay> enabledDates = new ArrayList<>();
         int firstDayOfWeek = Calendar.SUNDAY;
         int tileSizePx = -1;
         boolean topbarVisible = true;
@@ -1019,6 +1055,8 @@ public class MaterialCalendarView extends ViewGroup {
             out.writeParcelable(minDate, 0);
             out.writeParcelable(maxDate, 0);
             out.writeTypedList(selectedDates);
+            out.writeByte((byte) (hasCustomEnabledDays ? 1 : 0));
+            out.writeTypedList(enabledDates);
             out.writeInt(firstDayOfWeek);
             out.writeInt(tileSizePx);
             out.writeInt(topbarVisible ? 1 : 0);
@@ -1046,6 +1084,8 @@ public class MaterialCalendarView extends ViewGroup {
             ClassLoader loader = CalendarDay.class.getClassLoader();
             minDate = in.readParcelable(loader);
             maxDate = in.readParcelable(loader);
+            in.readTypedList(selectedDates, CalendarDay.CREATOR);
+            hasCustomEnabledDays = in.readByte() != 0;
             in.readTypedList(selectedDates, CalendarDay.CREATOR);
             firstDayOfWeek = in.readInt();
             tileSizePx = in.readInt();

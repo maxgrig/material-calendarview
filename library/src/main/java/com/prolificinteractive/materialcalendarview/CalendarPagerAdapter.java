@@ -13,6 +13,7 @@ import com.prolificinteractive.materialcalendarview.format.WeekDayFormatter;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,12 +37,14 @@ abstract class CalendarPagerAdapter<V extends CalendarPagerView> extends PagerAd
     private CalendarDay maxDate = null;
     private DateRangeIndex rangeIndex;
     private List<CalendarDay> selectedDates = new ArrayList<>();
+    private List<CalendarDay> enabledDates = new ArrayList<>();
     private WeekDayFormatter weekDayFormatter = WeekDayFormatter.DEFAULT;
     private DayFormatter dayFormatter = DayFormatter.DEFAULT;
     private List<DayViewDecorator> decorators = new ArrayList<>();
     private List<DecoratorResult> decoratorResults = null;
     private int firstDayOfTheWeek = Calendar.SUNDAY;
     private boolean selectionEnabled = true;
+    private boolean hasCustomEnabledDates = false;
 
     CalendarPagerAdapter(MaterialCalendarView mcv) {
         this.mcv = mcv;
@@ -154,6 +157,10 @@ abstract class CalendarPagerAdapter<V extends CalendarPagerView> extends PagerAd
         pagerView.setShowOtherDates(showOtherDates);
         pagerView.setMinimumDate(minDate);
         pagerView.setMaximumDate(maxDate);
+        pagerView.setHasCustomEnabledDates(hasCustomEnabledDates);
+        if (hasCustomEnabledDates) {
+            pagerView.setEnabledDates(enabledDates);
+        }
         pagerView.setSelectedDates(selectedDates);
 
         container.addView(pagerView);
@@ -271,6 +278,29 @@ abstract class CalendarPagerAdapter<V extends CalendarPagerView> extends PagerAd
 
     public DateRangeIndex getRangeIndex() {
         return rangeIndex;
+    }
+
+    public boolean getHasCustomEnabledDates() {
+        return hasCustomEnabledDates;
+    }
+
+    public void setHasCustomEnabledDates(boolean hasCustomEnabledDates) {
+        this.hasCustomEnabledDates = hasCustomEnabledDates;
+
+        notifyDataSetChanged();
+        invalidateSelectedDates();
+    }
+
+    public List<CalendarDay> getEnabledDates() {
+        return enabledDates;
+    }
+
+    public void setEnabledDates(List<CalendarDay> dates) {
+        setHasCustomEnabledDates(true);
+        this.enabledDates = dates;
+
+        notifyDataSetChanged();
+        invalidateSelectedDates();
     }
 
     public void clearSelections() {

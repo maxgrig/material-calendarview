@@ -33,6 +33,8 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
     private CalendarDay firstViewDay;
     private CalendarDay minDate = null;
     private CalendarDay maxDate = null;
+    private List<CalendarDay> enabledDates = new ArrayList<>();
+    private boolean hasCustomEnabledDates = false;
     private int firstDayOfWeek;
 
     private final Collection<DayView> dayViews = new ArrayList<>();
@@ -174,6 +176,25 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
         updateUi();
     }
 
+    public boolean getHasCustomEnabledDates() {
+        return hasCustomEnabledDates;
+    }
+
+    public void setHasCustomEnabledDates(boolean hasCustomEnabledDates) {
+        this.hasCustomEnabledDates = hasCustomEnabledDates;
+        updateUi();
+    }
+
+    public List<CalendarDay> getEnabledDates() {
+        return enabledDates;
+    }
+
+    public void setEnabledDates(List<CalendarDay> dates) {
+        setHasCustomEnabledDates(true);
+        this.enabledDates = dates;
+        updateUi();
+    }
+
     public void setSelectedDates(Collection<CalendarDay> dates) {
         for (DayView dayView : dayViews) {
             CalendarDay day = dayView.getDate();
@@ -185,8 +206,11 @@ abstract class CalendarPagerView extends ViewGroup implements View.OnClickListen
     protected void updateUi() {
         for (DayView dayView : dayViews) {
             CalendarDay day = dayView.getDate();
+            boolean inRange = getHasCustomEnabledDates()
+                    ? day.isInRange(minDate, maxDate, enabledDates)
+                    : day.isInRange(minDate, maxDate);
             dayView.setupSelection(
-                    showOtherDates, day.isInRange(minDate, maxDate), isDayEnabled(day));
+                    showOtherDates, inRange, isDayEnabled(day));
         }
         postInvalidate();
     }

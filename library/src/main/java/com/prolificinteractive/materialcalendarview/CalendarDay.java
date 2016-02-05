@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 
 /**
@@ -204,6 +205,10 @@ public final class CalendarDay implements Parcelable {
     public boolean isInRange(@Nullable CalendarDay minDate, @Nullable CalendarDay maxDate) {
         return !(minDate != null && minDate.isAfter(this)) &&
                 !(maxDate != null && maxDate.isBefore(this));
+    }
+
+    public boolean isInRange(@Nullable CalendarDay minDate, @Nullable CalendarDay maxDate, Collection<CalendarDay> dates) {
+        return isInRange(minDate, maxDate) && dates != null && dates.contains(this);
     }
 
     /**
