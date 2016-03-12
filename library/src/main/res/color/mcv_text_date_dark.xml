@@ -10,7 +10,7 @@
         android:color="@android:color/black" />
 
     <item android:state_enabled="false"
-        android:color="#808080" />
+        android:color="#E0E0E0" />
 
     <item android:color="@android:color/white" />
 
